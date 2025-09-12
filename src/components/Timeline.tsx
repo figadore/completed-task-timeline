@@ -131,17 +131,13 @@ export function Timeline() {
               </div>
 
               {/* Date on Left */}
-              <div className="absolute left-0 right-1/2 pr-8 text-right">
-                <div className="bg-card border rounded-lg p-3 shadow-sm">
-                  <p className="text-sm font-medium text-muted-foreground">
+              <div className="absolute left-0 right-1/2 pr-6 text-right">
+                <div className="inline-block bg-muted/30 border border-border/50 rounded px-2 py-1">
+                  <p className="text-xs font-medium text-muted-foreground leading-tight">
                     {item.date.toLocaleDateString('en-US', {
-                      weekday: 'short',
                       month: 'short',
                       day: 'numeric'
                     })}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.date.getFullYear()}
                   </p>
                 </div>
               </div>
