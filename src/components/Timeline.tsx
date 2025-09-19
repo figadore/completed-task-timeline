@@ -145,19 +145,19 @@ export function Timeline() {
       {/* Timeline */}
       <div className="relative max-w-4xl mx-auto">
         {/* Timeline Line */}
-        <div className="absolute left-1/2 transform -translate-x-px top-0 bottom-0 w-0.5 bg-border"></div>
+        <div className="absolute left-22 top-0 bottom-0 w-0.5 bg-border"></div>
 
         {/* Timeline Items */}
         <div className="space-y-8">
           {sortedItems.map((item, index) => (
             <div key={item.id} className="relative animate-slide-in-up" style={{ animationDelay: `${index * 100}ms` }}>
               {/* Timeline Dot */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 border-success bg-background z-10 shadow-[0_0_0_4px_hsl(var(--success)/0.2)]">
+              <div className="absolute left-22 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 border-success bg-background z-10 shadow-[0_0_0_4px_hsl(var(--success)/0.2)]">
                 <CheckCircle className="w-3 h-3 text-success absolute -top-0.5 -left-0.5" />
               </div>
 
-              {/* Date on Left */}
-              <div className="absolute left-0 right-1/2 pr-6 text-right">
+              {/* Date on Left - Minimal width */}
+              <div className="absolute left-0 w-20 text-right">
                 <div className="inline-block bg-muted/30 border border-border/50 rounded px-2 py-1">
                   <p className="text-xs font-medium text-muted-foreground leading-tight">
                     {item.date.toLocaleDateString('en-US', {
@@ -168,8 +168,8 @@ export function Timeline() {
                 </div>
               </div>
 
-              {/* Task Card on Right */}
-              <div className="absolute left-1/2 right-0 pl-8">
+              {/* Task Card on Right - Takes most space */}
+              <div className="absolute left-24 right-0">
                 <Card className="p-6 transition-all duration-300 hover:shadow-lg border-l-4 border-l-success bg-gradient-to-r from-success/5 to-transparent hover:from-success/10">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
