@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,25 @@ export interface TimelineItem {
   date: Date;
 }
 
-export function Timeline() {
-  const [items, setItems] = useState<TimelineItem[]>([
+const STORAGE_KEY = 'timeline-items';
+
+const getInitialItems = (): TimelineItem[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Convert date strings back to Date objects
+      return parsed.map((item: any) => ({
+        ...item,
+        date: new Date(item.date)
+      }));
+    }
+  } catch (error) {
+    console.warn('Failed to parse stored timeline items:', error);
+  }
+  
+  // Default items if nothing in localStorage
+  return [
     {
       id: '1',
       title: 'Completed React Timeline Project',
@@ -33,13 +50,22 @@ export function Timeline() {
       description: 'Successfully launched my portfolio website with custom animations',
       date: new Date('2024-01-25'),
     }
-  ]);
+  ];
+};
+
+export function Timeline() {
+  const [items, setItems] = useState<TimelineItem[]>(getInitialItems);
 
   const [showForm, setShowForm] = useState(false);
   const [newItem, setNewItem] = useState({
     title: '',
     description: '',
   });
+
+  // Save to localStorage whenever items change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const handleAddItem = () => {
     if (!newItem.title.trim()) return;
