@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, CheckCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, CheckCircle, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export interface TimelineItem {
   id: string;
@@ -87,6 +92,27 @@ export function Timeline() {
     });
   };
 
+  const handleDeleteItem = (id: string) => {
+    const itemToDelete = items.find(item => item.id === id);
+    setItems(prev => prev.filter(item => item.id !== id));
+    
+    toast({
+      title: "Task Deleted",
+      description: `"${itemToDelete?.title}" has been removed from your timeline.`,
+    });
+  };
+
+  const handleUpdateDate = (id: string, newDate: Date) => {
+    setItems(prev => prev.map(item => 
+      item.id === id ? { ...item, date: newDate } : item
+    ));
+    
+    toast({
+      title: "Date Updated",
+      description: `Task date has been updated to ${format(newDate, "PPP")}.`,
+    });
+  };
+
   const sortedItems = [...items].sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
@@ -158,23 +184,51 @@ export function Timeline() {
 
               {/* Date on Left - Minimal width */}
               <div className="absolute left-0 w-20 text-right">
-                <div className="inline-block bg-muted/30 border border-border/50 rounded px-2 py-1">
-                  <p className="text-xs font-medium text-muted-foreground leading-tight">
-                    {item.date.toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </p>
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="bg-muted/30 border border-border/50 rounded px-2 py-1 h-auto hover:bg-muted/50"
+                    >
+                      <CalendarIcon className="w-3 h-3 mr-1" />
+                      <span className="text-xs font-medium text-muted-foreground leading-tight">
+                        {item.date.toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={item.date}
+                      onSelect={(date) => date && handleUpdateDate(item.id, date)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Task Card on Right - Takes most space */}
               <div className="absolute left-24 right-0">
                 <Card className="p-6 transition-all duration-300 hover:shadow-lg border-l-4 border-l-success bg-gradient-to-r from-success/5 to-transparent hover:from-success/10">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-success" />
-                      <h3 className="font-semibold text-lg">{item.title}</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-success" />
+                        <h3 className="font-semibold text-lg">{item.title}</h3>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteItem(item.id)}
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                     
                     {item.description && (
