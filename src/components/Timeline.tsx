@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 export interface TimelineItem {
   id: string;
   title: string;
-  description: string;
   date: Date;
 }
 
@@ -40,19 +39,16 @@ const getInitialItems = (): TimelineItem[] => {
     {
       id: '1',
       title: 'Completed React Timeline Project',
-      description: 'Built a beautiful timeline component with TypeScript and Tailwind CSS',
       date: new Date('2024-01-15'),
     },
     {
       id: '2', 
       title: 'Finished Advanced TypeScript Course',
-      description: 'Learned generics, utility types, and advanced patterns',
       date: new Date('2024-01-20'),
     },
     {
       id: '3',
       title: 'Deployed Personal Portfolio',
-      description: 'Successfully launched my portfolio website with custom animations',
       date: new Date('2024-01-25'),
     }
   ];
@@ -64,7 +60,6 @@ export function Timeline() {
   const [showForm, setShowForm] = useState(false);
   const [newItem, setNewItem] = useState({
     title: '',
-    description: '',
   });
 
   // Save to localStorage whenever items change
@@ -78,12 +73,11 @@ export function Timeline() {
     const item: TimelineItem = {
       id: Date.now().toString(),
       title: newItem.title,
-      description: newItem.description,
       date: new Date(),
     };
 
     setItems(prev => [item, ...prev]);
-    setNewItem({ title: '', description: '' });
+    setNewItem({ title: '' });
     setShowForm(false);
     
     toast({
@@ -149,13 +143,6 @@ export function Timeline() {
               onChange={(e) => setNewItem(prev => ({ ...prev, title: e.target.value }))}
             />
             
-            <Textarea
-              placeholder="Add description (optional)..."
-              value={newItem.description}
-              onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
-            />
-            
             <div className="flex gap-2">
               <Button onClick={handleAddItem} className="flex-1 bg-success hover:bg-success/90">
                 Add Task
@@ -214,32 +201,26 @@ export function Timeline() {
 
               {/* Task Card on Right - Takes most space */}
               <div className="absolute left-24 right-0">
-                <Card className="p-6 transition-all duration-300 hover:shadow-lg border-l-4 border-l-success bg-gradient-to-r from-success/5 to-transparent hover:from-success/10">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-success" />
-                        <h3 className="font-semibold text-lg">{item.title}</h3>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                <Card className="p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-l-success bg-gradient-to-r from-success/5 to-transparent hover:from-success/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-success" />
+                      <h3 className="font-semibold text-lg">{item.title}</h3>
                     </div>
-                    
-                    {item.description && (
-                      <p className="text-muted-foreground pl-7">{item.description}</p>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </Card>
               </div>
 
               {/* Spacer for absolute positioning */}
-              <div className="h-24"></div>
+              <div className="h-16"></div>
             </div>
           ))}
         </div>
