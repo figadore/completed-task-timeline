@@ -71,3 +71,28 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Publishing to GitHub Pages
+
+This repository is a Vite app. The workflow below builds the site and deploys the `dist/` output to GitHub Pages whenever you push to the `main` branch.
+
+What I added:
+
+- A `base` value in `vite.config.ts` that defaults to `/${process.env.REPO_NAME || 'completed-task-timeline'}/` for production builds.
+- A GitHub Actions workflow at `.github/workflows/pages.yml` that builds and deploys on push to `main`.
+
+How to use:
+
+1. Open the repository Settings → Pages and ensure the Pages source is set to "GitHub Actions". (The workflow will create the Pages deployment automatically after a successful run.)
+2. Push to `main` — GitHub Actions will run, build the site, and deploy it.
+3. Your site will be available at `https://<your-username>.github.io/completed-task-timeline/` (or at the repository page for an organization repo).
+
+Alternatives:
+
+- If you prefer a `gh-pages` branch approach, you can use the `gh-pages` npm package to push the built `dist/` to a branch. This approach requires changing `vite.config.ts` base to `./` or `/completed-task-timeline/` depending on your target. Example:
+
+	npm run build && npx gh-pages -d dist -b gh-pages
+
+- Or publish the build into a `docs/` folder and configure Pages to serve from the `docs` folder on `main`.
+
+If you want, I can: enable a `./` base for relative paths, create a `gh-pages` script, or adjust the workflow to publish from another branch—tell me which option you prefer.
