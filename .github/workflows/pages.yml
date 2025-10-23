@@ -23,8 +23,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
+        # When deploying to a custom domain (CNAME present) the site is served from the domain root.
+        # Build with an empty REPO_NAME so Vite's `base` becomes `/` and asset paths are correct.
         env:
-          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_NAME: ""
         run: npm run build
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v4
