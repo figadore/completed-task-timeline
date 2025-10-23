@@ -147,10 +147,23 @@ export function Timeline() {
             };
           });
 
-        setItems(prev => [...imported, ...prev]);
-        toast({
-          title: "Imported",
-          description: `${imported.length} tasks imported successfully.`,
+        setItems(prev => {
+          // Filter out duplicates based on title and date
+          const uniqueImported = imported.filter(newItem => 
+            !prev.some(existingItem => 
+              existingItem.title === newItem.title && 
+              existingItem.date.toDateString() === newItem.date.toDateString()
+            )
+          );
+          
+          const skipped = imported.length - uniqueImported.length;
+          
+          toast({
+            title: "Imported",
+            description: `${uniqueImported.length} tasks imported${skipped > 0 ? `, ${skipped} duplicates skipped` : ''}.`,
+          });
+          
+          return [...uniqueImported, ...prev];
         });
       } catch (error) {
         toast({
