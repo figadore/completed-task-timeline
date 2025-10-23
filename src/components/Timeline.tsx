@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, CheckCircle, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, CheckCircle, Trash2, Calendar as CalendarIcon, Download, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -107,6 +107,63 @@ export function Timeline() {
     });
   };
 
+  const handleExportCSV = () => {
+    const csvContent = [
+      ['Title', 'Date'],
+      ...items.map(item => [item.title, item.date.toISOString()])
+    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `timeline-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Exported",
+      description: "Timeline exported to CSV successfully.",
+    });
+  };
+
+  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const lines = text.split('\n').slice(1); // Skip header
+        const imported: TimelineItem[] = lines
+          .filter(line => line.trim())
+          .map(line => {
+            const [title, dateStr] = line.split(',').map(cell => cell.replace(/^"|"$/g, '').trim());
+            return {
+              id: Date.now().toString() + Math.random(),
+              title,
+              date: new Date(dateStr)
+            };
+          });
+
+        setItems(prev => [...imported, ...prev]);
+        toast({
+          title: "Imported",
+          description: `${imported.length} tasks imported successfully.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Import Failed",
+          description: "Failed to parse CSV file. Please check the format.",
+          variant: "destructive",
+        });
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
   const sortedItems = [...items].sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
@@ -122,7 +179,7 @@ export function Timeline() {
       </div>
 
       {/* Add Item Button */}
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-2 flex-wrap">
         <Button 
           onClick={() => setShowForm(!showForm)}
           className="bg-success hover:bg-success/90 shadow-lg hover:shadow-xl transition-all duration-300"
@@ -131,6 +188,29 @@ export function Timeline() {
           <Plus className="w-4 h-4 mr-2" />
           Add Completed Task
         </Button>
+        <Button 
+          onClick={handleExportCSV}
+          variant="outline"
+          size="lg"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
+        <Button 
+          variant="outline"
+          size="lg"
+          onClick={() => document.getElementById('csv-import')?.click()}
+        >
+          <Upload className="w-4 h-4 mr-2" />
+          Import CSV
+        </Button>
+        <input
+          id="csv-import"
+          type="file"
+          accept=".csv"
+          onChange={handleImportCSV}
+          className="hidden"
+        />
       </div>
 
       {/* Add Item Form */}
